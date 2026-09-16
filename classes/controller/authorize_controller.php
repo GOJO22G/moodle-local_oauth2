@@ -127,7 +127,7 @@ class authorize_controller extends openid_authorize_controller {
             }
 
             $codechallengemethod = $request->query('code_challenge_method');
-            if (!in_array($codechallengemethod, ['plain', 'S256'], true)) {
+            if (!in_array($codechallengemethod, ['S256'], true)) {
                 $response->setError(
                     400,
                     'missing_code_challenge_method',
