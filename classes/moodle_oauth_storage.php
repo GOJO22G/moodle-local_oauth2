@@ -115,7 +115,11 @@ class moodle_oauth_storage implements
             return true;
         }
 
-        return $clientsecretfield === $clientsecret;
+        if (empty($clientsecretfield) || empty($clientsecret)) {
+            return false;
+        }
+
+        return password_verify($clientsecret, $clientsecretfield);
     }
 
     /**
@@ -163,8 +167,19 @@ class moodle_oauth_storage implements
     public function setClientDetails($clientid, $clientsecret, $redirecturi, $scope = null) {
         global $DB;
 
+        // Hash the secret before storing it - keep a small non-secret
+        // fragment (last4) so the admin UI can show a masked hint.
+        // Public clients (empty secret) are left as an empty string.
+        $storedsecret = $clientsecret;
+        $last4 = null;
+        if (!empty($clientsecret)) {
+            $last4 = substr($clientsecret, -4);
+            $storedsecret = password_hash($clientsecret, PASSWORD_DEFAULT);
+        }
+
         if ($client = $DB->get_record('local_oauth2_client', ['client_id' => $clientid])) {
-            $client->client_secret = $clientsecret;
+            $client->client_secret = $storedsecret;
+            $client->client_secret_last4 = $last4;
             $client->redirect_uri = $redirecturi;
             $client->scope = $scope;
 
@@ -172,7 +187,8 @@ class moodle_oauth_storage implements
         } else {
             $client = new stdClass();
             $client->client_id = $clientid;
-            $client->client_secret = $clientsecret;
+            $client->client_secret = $storedsecret;
+            $client->client_secret_last4 = $last4;
             $client->redirect_uri = $redirecturi;
             $client->scope = $scope;
 
