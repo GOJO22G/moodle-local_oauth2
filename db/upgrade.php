@@ -152,5 +152,19 @@ function xmldb_local_oauth2_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025100601.02, 'local', 'oauth2');
     }
 
+    if ($oldversion < 2026091600) {
+        $table = new xmldb_table('local_oauth2_client');
+
+        // Add client_secret_last4 field - a small, non-secret fragment kept in
+        // plain text purely so the admin UI can show a masked hint (e.g.
+        // ....1a2b) once client_secret itself becomes a one-way password_hash.
+        $field = new xmldb_field('client_secret_last4', XMLDB_TYPE_CHAR, '4', null, null, null, null, 'client_secret');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026091600, 'local', 'oauth2');
+    }
+
     return true;
 }
