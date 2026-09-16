@@ -165,6 +165,31 @@ function xmldb_local_oauth2_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2026091600, 'local', 'oauth2');
     }
+    if ($oldversion < 2026091601) {
+        // Widen token/code columns from CHAR(40) to CHAR(255) - the current
+        // token generation produces strings longer than 40 characters, which
+        // caused a dml_write_exception ("Data too long for column") on every
+        // real login.
+        $table = new xmldb_table('local_oauth2_access_token');
+        $field = new xmldb_field('access_token', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_precision($table, $field);
+        }
+
+        $table = new xmldb_table('local_oauth2_refresh_token');
+        $field = new xmldb_field('refresh_token', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_precision($table, $field);
+        }
+
+        $table = new xmldb_table('local_oauth2_authorization_code');
+        $field = new xmldb_field('authorization_code', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_precision($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2026091601, 'local', 'oauth2');
+    }
 
     return true;
 }

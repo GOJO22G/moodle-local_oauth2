@@ -31,6 +31,9 @@ use OAuth2\Request;
 // phpcs:ignore moodle.Files.RequireLogin.Missing -- This file is token endpoint, no need to require login.
 require_once(__DIR__ . '/../../config.php');
 
+error_reporting(E_ALL & ~E_DEPRECATED);
+ini_set('display_errors', '0');
+
 // Set page context for API endpoint.
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/local/oauth2/token.php');

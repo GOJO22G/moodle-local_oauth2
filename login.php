@@ -31,6 +31,9 @@ use local_oauth2\event\user_not_granted;
 // phpcs:ignore moodle.Files.RequireLogin.Missing -- This file is used to log in users.
 require_once(__DIR__ . '/../../config.php');
 
+error_reporting(E_ALL & ~E_DEPRECATED);
+ini_set('display_errors', '0');
+
 $clientid = required_param('client_id', PARAM_TEXT);
 $responsetype = required_param('response_type', PARAM_TEXT);
 $scope = optional_param('scope', false, PARAM_TEXT);
