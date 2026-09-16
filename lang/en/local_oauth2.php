@@ -102,6 +102,7 @@ $string['oauth_client_not_exists'] = 'Oauth client does not exist';
 $string['oauth_client_id_cannot_contain_space'] = 'Client ID cannot contain space';
 $string['oauth_client_id_already_exists'] = 'Client ID already exists';
 $string['oauth_client_changes_saved'] = 'OAuth client changes saved';
+$string['oauth_client_secret_shown_once'] = 'Client secret: {$a} - copy this now, it will not be shown again.';
 $string['delete_oauth_client_confirm'] = 'Are you sure you want to delete this OAuth client?';
 $string['error_creating_oauth_client'] = 'Error occurred while creating OAuth client';
 $string['error_deleting_oauth_client'] = 'Error occurred while deleting OAuth client';
