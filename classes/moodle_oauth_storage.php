@@ -196,14 +196,27 @@ class moodle_oauth_storage implements
     /**
      * Look up the supplied oauth_token from storage.
      *
-     * @param string $oauthtoken
-     * @return bool
+    /**
+     * Hash a bearer token before storing or looking it up, so a raw
+     * database dump does not expose usable tokens. SHA-256 is used
+     * (not password_hash) because tokens are high-entropy random
+     * strings, not low-entropy secrets - a fast, deterministic hash
+     * still lets us look tokens up by exact match.
+     *
+     * @param string $token
+     * @return string
      */
+    private static function hash_token($token) {
+        return hash('sha256', $token);
+    }
+
     public function getAccessToken($oauthtoken) {
         global $DB;
 
-        if ($token = $DB->get_record('local_oauth2_access_token', ['access_token' => $oauthtoken])) {
+        $hashed = self::hash_token($oauthtoken);
+        if ($token = $DB->get_record('local_oauth2_access_token', ['access_token' => $hashed])) {
             unset($token->id);
+            $token->access_token = $oauthtoken;
             return (array)$token;
         } else {
             return false;
@@ -223,7 +236,9 @@ class moodle_oauth_storage implements
     public function setAccessToken($accesstoken, $clientid, $userid, $expires, $scope = null) {
         global $DB;
 
-        if ($token = $DB->get_record('local_oauth2_access_token', ['access_token' => $accesstoken])) {
+        $hashed = self::hash_token($accesstoken);
+
+        if ($token = $DB->get_record('local_oauth2_access_token', ['access_token' => $hashed])) {
             $token->client_id = $clientid;
             $token->user_id = $userid;
             $token->expires = $expires;
@@ -245,7 +260,7 @@ class moodle_oauth_storage implements
             $event->trigger();
         } else {
             $token = new stdClass();
-            $token->access_token = $accesstoken;
+            $token->access_token = $hashed;
             $token->client_id = $clientid;
             $token->user_id = $userid;
             $token->expires = $expires;
@@ -598,8 +613,11 @@ class moodle_oauth_storage implements
     public function getRefreshToken($refreshtoken) {
         global $DB;
 
-        if ($token = $DB->get_record('local_oauth2_refresh_token', ['refresh_token' => $refreshtoken])) {
+        $hashed = self::hash_token($refreshtoken);
+
+        if ($token = $DB->get_record('local_oauth2_refresh_token', ['refresh_token' => $hashed])) {
             unset($token->id);
+            $token->refresh_token = $refreshtoken;
             return (array)$token;
         } else {
             return false;
@@ -622,7 +640,8 @@ class moodle_oauth_storage implements
     public function unsetRefreshToken($refreshtoken) {
         global $DB;
 
-        return $DB->delete_records('local_oauth2_refresh_token', ['refresh_token' => $refreshtoken]);
+        $hashed = self::hash_token($refreshtoken);
+        return $DB->delete_records('local_oauth2_refresh_token', ['refresh_token' => $hashed]);
     }
 
     /**
@@ -643,8 +662,10 @@ class moodle_oauth_storage implements
     public function setRefreshToken($refreshtoken, $clientid, $userid, $expires, $scope = null) {
         global $DB;
 
+        $hashed = self::hash_token($refreshtoken);
+
         $token = new stdClass();
-        $token->refresh_token = $refreshtoken;
+        $token->refresh_token = $hashed;
         $token->client_id = $clientid;
         $token->user_id = $userid;
         $token->expires = $expires;
