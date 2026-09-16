@@ -59,7 +59,7 @@ class oauth_clients_table extends html_table {
                 html_writer::link($deleteurl, get_string('delete'));
             $row = [
                 $client->client_id,
-                $client->client_secret,
+                empty($client->client_secret) ? '' : '********' . ($client->client_secret_last4 ?? '????'),
                 $client->scope,
                 $actions,
             ];
