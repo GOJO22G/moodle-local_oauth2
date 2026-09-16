@@ -31,7 +31,6 @@ use local_oauth2\form\authorize_form;
 use local_oauth2\response_type\id_token as oidc_id_token_response;
 use OAuth2\Autoloader;
 use OAuth2\GrantType\RefreshToken;
-use OAuth2\GrantType\UserCredentials;
 use OAuth2\OpenID\GrantType\AuthorizationCode as oidc_authorization_code_grant;
 use OAuth2\OpenID\ResponseType\AuthorizationCode as oidc_authorization_code_response;
 use OAuth2\OpenID\ResponseType\CodeIdToken as oidc_code_id_token_response;
@@ -129,8 +128,6 @@ class utils {
         // Add the "Authorization Code" grant type.
         $server->addGrantType(new oidc_authorization_code_grant($storage));
 
-        // Add the "Password" grant type (Resource Owner Password Credentials).
-        $server->addGrantType(new UserCredentials($storage));
 
         // Add the "Refresh Token" grant type.
         $server->addGrantType(new RefreshToken($storage, [
@@ -335,7 +332,7 @@ class utils {
             'userinfo_endpoint' => self::get_endpoint_url('userinfo.php'),
             'jwks_uri' => self::get_endpoint_url('jwks.php'),
             'response_types_supported' => ['code'],
-            'grant_types_supported' => ['authorization_code', 'refresh_token', 'password'],
+            'grant_types_supported' => ['authorization_code', 'refresh_token'],
             'subject_types_supported' => ['public'],
             'id_token_signing_alg_values_supported' => ['RS256'],
             'token_endpoint_auth_methods_supported' => ['client_secret_basic', 'client_secret_post', 'none'],
