@@ -31,5 +31,5 @@ $plugin->component    = 'local_oauth2';
 $plugin->release      = '4.5.0';
 $plugin->version      = 2026091500;
 $plugin->requires     = 2024100700;
-$plugin->supported    = [502, 502];
+$plugin->supported    = [405, 502];
 $plugin->maturity     = MATURITY_STABLE;
