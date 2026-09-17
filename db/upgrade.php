@@ -169,24 +169,34 @@ function xmldb_local_oauth2_upgrade($oldversion) {
         // Widen token/code columns from CHAR(40) to CHAR(255) - the current
         // token generation produces strings longer than 40 characters, which
         // caused a dml_write_exception ("Data too long for column") on every
-        // real login.
+        // real login. Each column has a UNIQUE key on it, which must be
+        // dropped before the column can be resized, then recreated after.
         $table = new xmldb_table('local_oauth2_access_token');
+        $key = new xmldb_key('access_token', XMLDB_KEY_UNIQUE, ['access_token']);
+        $dbman->drop_key($table, $key);
         $field = new xmldb_field('access_token', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
+        $dbman->add_key($table, $key);
 
         $table = new xmldb_table('local_oauth2_refresh_token');
+        $key = new xmldb_key('refresh_token', XMLDB_KEY_UNIQUE, ['refresh_token']);
+        $dbman->drop_key($table, $key);
         $field = new xmldb_field('refresh_token', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
+        $dbman->add_key($table, $key);
 
         $table = new xmldb_table('local_oauth2_authorization_code');
+        $key = new xmldb_key('authorization_code', XMLDB_KEY_UNIQUE, ['authorization_code']);
+        $dbman->drop_key($table, $key);
         $field = new xmldb_field('authorization_code', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'id');
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
+        $dbman->add_key($table, $key);
 
         upgrade_plugin_savepoint(true, 2026091601, 'local', 'oauth2');
     }
