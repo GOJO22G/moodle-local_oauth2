@@ -201,5 +201,26 @@ function xmldb_local_oauth2_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026091601, 'local', 'oauth2');
     }
 
+    if ($oldversion < 2026091602) {
+        // Backfill for existing sites: local_mcpbridge/webservice_mcp need these
+        // scopes to exist before any login happens, not just after a first
+        // login triggers local_mcpbridge's own observer-based seeding. New
+        // installs get these from db/install.php instead; this covers sites
+        // that already had local_oauth2 installed before this version.
+        $defaultscopes = [
+            ['scope' => 'moodle_mcp_read', 'is_default' => 0],
+            ['scope' => 'moodle_mcp_write', 'is_default' => 0],
+        ];
+
+        foreach ($defaultscopes as $scopedata) {
+            if (!$DB->record_exists('local_oauth2_scope', ['scope' => $scopedata['scope']])) {
+                $record = (object) $scopedata;
+                $DB->insert_record('local_oauth2_scope', $record);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026091602, 'local', 'oauth2');
+    }
+
     return true;
 }

@@ -18,7 +18,7 @@
  * Plugin version information.
  *
  * @package local_oauth2
- * @author Pau Ferrer Ocaña <pferre22@xtec.cat>
+ * @author Pau Ferrer OcaÃ±a <pferre22@xtec.cat>
  * @author Lai Wei <lai.wei@enovation.ie>
  * @author Dorel Manolescu <dorel.manolescu@enovation.ie>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -29,7 +29,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component    = 'local_oauth2';
 $plugin->release      = '4.5.0';
-$plugin->version      = 2026091601;
+$plugin->version      = 2026091602;
 $plugin->requires     = 2024100700;
 $plugin->supported    = [405, 502];
 $plugin->maturity     = MATURITY_STABLE;

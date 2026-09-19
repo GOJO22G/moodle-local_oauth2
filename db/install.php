@@ -42,6 +42,14 @@ function xmldb_local_oauth2_install() {
         ['scope' => 'offline_access', 'is_default' => 0],
         ['scope' => 'address', 'is_default' => 0],
         ['scope' => 'phone', 'is_default' => 0],
+        // Added for local_mcpbridge/webservice_mcp integration: these scopes
+        // must exist at install time, not only after a first login, so a
+        // client can request MCP read/write permission on its very first
+        // OAuth authorization on a genuinely fresh site - see
+        // local_mcpbridge's own db/install.php and classes/observers.php
+        // for the same seeding done defensively from that plugin's side too.
+        ['scope' => 'moodle_mcp_read', 'is_default' => 0],
+        ['scope' => 'moodle_mcp_write', 'is_default' => 0],
     ];
 
     // Insert default scopes if they don't already exist.
